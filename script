@@ -1,0 +1,116 @@
+#from cassandra import ConsistencyLevel
+from cassandra.cluster import Cluster
+#from cassandra.query import SimpleStatement
+
+if __name__ == "__main__":
+	file=open("part-00000");
+	file2=open("part-00001");
+	file3=open("part-00002");
+	file4=open("part-00003");
+	frec=[];
+	item=();
+	data=[];
+	firstTime=True;
+	repeated=False;
+
+
+	for line in file:
+		a,b,c=line.split(",");
+		if (firstTime==True):
+			if(a[1:]!=b):
+				frec=[b,float(c[:-2])];
+				item=(a[1:],[]);
+				data.append(item);
+				data[0][1].append(frec);
+				firstTime=False;
+		else:
+			if(a[1:]!=b):
+				for i in range(len(data)):
+					if(a[1:] == data[i][0]):
+						frec=[b,float(c[:-2])];
+						data[i][1].append(frec);
+						data[i][1].sort(key = lambda tup: tup[1]);
+						repeated=True;
+				if(repeated==False):
+					frec=[b,float(c[:-2])];
+					item=(a[1:],[]);
+					data.append(item);
+					data[len(data)-1][1].append(frec);
+		repeated=False;
+
+	print("Acabe el primer ciclo");
+
+	for line in file2:
+		a,b,c=line.split(",");
+		if(a[1:]!=b):
+			for i in range(len(data)):
+				if(a[1:] == data[i][0]):
+					frec=[b,float(c[:-2])];
+					data[i][1].append(frec);
+					data[i][1].sort(key = lambda tup: tup[1]);
+					repeated=True;
+			if(repeated==False):
+				frec=[b,float(c[:-2])];
+				item=(a[1:],[]);
+				data.append(item);
+				data[len(data)-1][1].append(frec);
+		repeated=False;
+
+
+	print("Acabe el segundo ciclo");
+
+	for line in file3:
+		a,b,c=line.split(",");
+		if(a[1:]!=b):
+			for i in range(len(data)):
+				if(a[1:] == data[i][0]):
+					frec=[b,float(c[:-2])];
+					data[i][1].append(frec);
+					data[i][1].sort(key = lambda tup: tup[1]);
+					repeated=True;
+			if(repeated==False):
+				frec=[b,float(c[:-2])];
+				item=(a[1:],[]);
+				data.append(item);
+				data[len(data)-1][1].append(frec);
+		repeated=False;
+
+	print("Acabe el tercer ciclo");
+
+	for line in file4:
+		a,b,c=line.split(",");
+		if(a[1:]!=b):
+			for i in range(len(data)):
+				if(a[1:] == data[i][0]):
+					frec=[b,float(c[:-2])];
+					data[i][1].append(frec);
+					data[i][1].sort(key = lambda tup: tup[1]);
+					repeated=True;
+			if(repeated==False):
+				frec=[b,float(c[:-2])];
+				item=(a[1:],[]);
+				data.append(item);
+				data[len(data)-1][1].append(frec);
+		repeated=False;
+
+	print("Acabe el ultimo ciclo");
+	cluster = Cluster();
+	session = cluster.connect('dev');
+	for i in range(len(data)):
+		doc=data[i][0];
+		a0=data[i][1][0][0]
+		a1=data[i][1][0][1]
+		b0=data[i][1][1][0]
+		b1=data[i][1][1][1]
+		c0=data[i][1][2][0]
+		c1=data[i][1][2][1]
+		d0=data[i][1][3][0]
+		d1=data[i][1][3][1]
+		e0=data[i][1][4][0]
+		e1=data[i][1][4][1]
+		session.execute("""INSERT INTO matrix (doc,simil) VALUES (%s, %s)""",(doc,[str(a0),str(a1),str(b0),str(b1),str(c0),str(c1),str(d0),str(d1),str(e0),str(e1)]));
+	
+	file.close();
+	file2.close();
+	file3.close();
+	file4.close();
